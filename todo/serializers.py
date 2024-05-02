@@ -24,7 +24,7 @@ class CreateTaskSerializer(serializers.ModelSerializer):
 class DeleteTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ['is_acitve']
+        fields = ['is_active']
 
 
 class CompleteTaskSerializer(serializers.ModelSerializer):
