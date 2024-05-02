@@ -6,16 +6,55 @@
     <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
 </head>
 <body>
-    <h1>Task List</h1>
+    {% if user.is_authenticated %}
+        <h1>Task List</h1>
     <form id="add-task-form" hx-post="{% url 'task-create' %}" hx-trigger="submit" hx-target="#task-list">
-        {% csrf_token %}
         <input type="text" name="task" placeholder="Enter task">
         <button type="submit">Add Task</button>
     </form>
     <ul id="task-list">
         {% for task in tasks %}
-            <li><button hx-patch="{% url 'task-complete' task.id %}">Complete</button>  {{ task.task }}  <button hx-post="{% url 'task-delete' task.id %}">Delete</button></li>
+            <li><button hx-patch="{% url 'task-complete' task.id %}">Complete</button>  {{ task.task }}  
+                
+                <form hx-patch="{% url 'task-delete' task.id %}">
+                <button type="submit">Delete</button></li>
+                </form>
         {% endfor %}
     </ul>
+    <hr>
+    <form hx-post="{% url 'logout' %}">
+        <button type="submit">Logout</button>
+    </form>
+    {% else %}
+    <h1>Login</h1>
+    <form hx-post="{% url 'login' %}">
+        <input type="text" name="username" placeholder="Username" required><br>
+        <input type="password" name="password" placeholder="Password" required><br>
+        <button type="submit">Login</button>
+    </form>
+
+    <hr>
+
+    <h1>Register</h1>
+    <form hx-post="{% url 'register' %}">
+        <input type="text" name="username" placeholder="Username" required><br>
+        <input type="email" name="email" placeholder="Email" required><br>
+        <input type="password" name="password" placeholder="Password" required><br>
+        <button type="submit">Register</button>
+    </form>
+    {% endif %}
 </body>
+<script>
+    document.body.addEventListener('htmx:configRequest', (event) => {
+        event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+    });
+
+    document.body.addEventListener('htmx:afterRequest', function(event) {
+        if (event.detail.xhr.responseURL.endsWith("{% url 'task-create' %}")) {
+          htmx.refresh("#task-list");
+        }
+      });
+</script>
 </html>
+
+

@@ -1,6 +1,6 @@
 from django.shortcuts import redirect, render
 from rest_framework.views import APIView
-from rest_framework import status
+from rest_framework import permissions, status
 from rest_framework.generics import UpdateAPIView
 from rest_framework.response import Response
 from .serializers import CompleteTaskSerializer, DeleteTaskSerializer, TaskSerializer, CreateTaskSerializer
@@ -9,9 +9,12 @@ from .models import Task
 # Create your views here.
 
 class TaskAPIView(APIView):
+    queryset = Task.objects.filter(is_active=True)
+    permission_classes = (permissions.AllowAny,)
+
     def get(self, request):
-        tasks = Task.objects.filter(is_active=True)
-        serializer = TaskSerializer(tasks, many=True)
+        queryset = Task.objects.filter(is_active=True)
+        serializer = TaskSerializer(queryset, many=True)
         context = {'tasks': serializer.data}
         return render(request, 'index.html', context)
     
@@ -19,14 +22,15 @@ class TaskAPIView(APIView):
         serializer = CreateTaskSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            context = self.get()
-            return Response(context, status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TaskDeleteAPIView(UpdateAPIView):
     serializer_class = DeleteTaskSerializer
+    queryset = Task.objects.filter(is_active=True)
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
         task_id = self.kwargs.get('task_id')
@@ -43,6 +47,8 @@ class TaskDeleteAPIView(UpdateAPIView):
 
 class TaskCompleteAPIView(UpdateAPIView):
     serializer_class = CompleteTaskSerializer
+    queryset = Task.objects.filter(is_active=True)
+    permission_classes = (permissions.AllowAny,)
 
     def get_object(self):
         task_id = self.kwargs.get('task_id')
