@@ -1,29 +1,26 @@
 from django.shortcuts import redirect, render
-from django.views.generic import TemplateView
+from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView
+from rest_framework.generics import UpdateAPIView
 from rest_framework.response import Response
 from .serializers import CompleteTaskSerializer, DeleteTaskSerializer, TaskSerializer, CreateTaskSerializer
 from .models import Task
 
 # Create your views here.
 
-class TaskListAPIView(TemplateView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+class TaskAPIView(APIView):
+    def get(self, request):
         tasks = Task.objects.filter(is_active=True)
         serializer = TaskSerializer(tasks, many=True)
-        context['tasks'] = serializer.data
-        return context
-
-
-class TaskCrateAPIView(CreateAPIView):
-    serializer_class = CreateTaskSerializer
+        context = {'tasks': serializer.data}
+        return render(request, 'index.html', context)
+    
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        serializer = CreateTaskSerializer(data=request.data)
         if serializer.is_valid():
-            self.perform_create(serializer)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            serializer.save()
+            context = self.get()
+            return Response(context, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

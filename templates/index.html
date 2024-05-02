@@ -7,17 +7,15 @@
 </head>
 <body>
     <h1>Task List</h1>
-    <form id="add-task-form" hx-post="{% url 'task-create' %}" hx-trigger="submit" hx-target="#task-list" hx-insert="beforeend">
+    <form id="add-task-form" hx-post="{% url 'task-create' %}" hx-trigger="submit" hx-target="#task-list">
         {% csrf_token %}
         <input type="text" name="task" placeholder="Enter task">
         <button type="submit">Add Task</button>
     </form>
-    <div id="task-list-container">
-        <ul id="task-list">
-            {% for task in tasks %}
-                <li><button hx-post="{% url 'task-complete' task.id %}">Complete</button>  {{ task.task }}  <button hx-post="{% url 'task-delete' task.id %}">Delete</button></li>
-            {% endfor %}
-        </ul>
-    </div>
+    <ul id="task-list">
+        {% for task in tasks %}
+            <li><button hx-patch="{% url 'task-complete' task.id %}">Complete</button>  {{ task.task }}  <button hx-post="{% url 'task-delete' task.id %}">Delete</button></li>
+        {% endfor %}
+    </ul>
 </body>
 </html>
