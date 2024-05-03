@@ -33,7 +33,7 @@ class TaskDeleteAPIView(UpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
-        task_id = self.kwargs.get('id')
+        task_id = self.kwargs.get('task_id')
         task = Task.objects.get(id=task_id)
         return task
     
@@ -41,7 +41,6 @@ class TaskDeleteAPIView(UpdateAPIView):
         task = self.get_object()
         task.is_active = False
         task.save()
-        serializer = self.get_serializer(task)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -60,5 +59,5 @@ class TaskCompleteAPIView(UpdateAPIView):
         task.is_complete = True
         task.save()
         serializer = self.get_serializer(task)
-        return Response(serializer.data)
+        return Response(status=status.HTTP_204_NO_CONTENT)
     
