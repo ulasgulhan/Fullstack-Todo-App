@@ -21,6 +21,7 @@ class TaskAPIView(APIView):
     def post(self, request, *args, **kwargs):
         serializer = CreateTaskSerializer(data=request.data)
         if serializer.is_valid():
+            serializer.validated_data['user_id'] = request.user.id
             serializer.save()
             return Response(status=status.HTTP_201_CREATED)
         else:

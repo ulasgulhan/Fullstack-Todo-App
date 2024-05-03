@@ -11,10 +11,11 @@ class TaskSerializer(serializers.ModelSerializer):
 class CreateTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ['task']
+        fields = ['user_id', 'task']
     
     def save(self):
         task = Task.objects.create(
+            user_id = self.validated_data['user_id'],
             task = self.validated_data['task']
         )
 
