@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from rest_framework.views import APIView
@@ -13,13 +14,12 @@ from .models import Task
 class TaskAPIView(APIView):
     queryset = Task.objects.filter(is_active=True)
     permission_classes = (permissions.AllowAny,)
-    renderer_classes = [TemplateHTMLRenderer]
 
     def get(self, request):
         queryset = Task.objects.filter(is_active=True)
         serializer = TaskSerializer(queryset, many=True)
         context = {'tasks': serializer.data}
-        return Response(context, template_name='index.html')
+        return Response(context)
     
     def post(self, request, *args, **kwargs):
         serializer = CreateTaskSerializer(data=request.data)
@@ -31,7 +31,7 @@ class TaskAPIView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class TaskDeleteAPIView(DestroyAPIView):
+class TaskDeleteAPIView(UpdateAPIView):
     serializer_class = DeleteTaskSerializer
     queryset = Task.objects.filter(is_active=True)
     permission_classes = [permissions.IsAuthenticated]
@@ -41,7 +41,7 @@ class TaskDeleteAPIView(DestroyAPIView):
         task = Task.objects.get(id=task_id)
         return task
     
-    def delete(self, request, *args, **kwargs):
+    def update(self, request, *args, **kwargs):
         task = self.get_object()
         task.is_active = False
         task.save()
@@ -63,5 +63,4 @@ class TaskCompleteAPIView(UpdateAPIView):
         task.is_complete = True
         task.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
 

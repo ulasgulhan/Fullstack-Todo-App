@@ -17,12 +17,11 @@
     </form>
     <hr>
 
-    <div id="task-list" hx-get="{% url 'task-list' %}">
-        {% for task in tasks %}
-            <button hx-patch="{% url 'task-complete' task.id %} ">Complete</button> - <ul>{{task.task}}</ul> - <button hx-delete="{% url 'task-delete' task.id %} " id="delete-button">Delete</button> <br>
-        {% endfor %}
+    <div id="task-list">
+        
     </div>
 
+    
     <hr>
 
     <button class='text-base font-bold bg-red-500 hover:bg-red-600 text-white rounded' hx-post="{% url 'logout' %}">Logout</button>
@@ -52,10 +51,87 @@
     });
 
     document.body.addEventListener('htmx:afterRequest', (event) => {
+        fetchTasks()
         document.querySelector("input[name='task']").value = '';
-        location.reload();
     });
 
+    function fetchTasks() {
+        fetch('http://127.0.0.1:8000/api/tasks/')
+            .then(response => response.json())
+            .then(data => {
+                const tasksContainer = document.getElementById('task-list');
+                tasksContainer.innerHTML = '';
+                data.tasks.forEach(task => {
+                    const taskDiv = document.createElement('div');
+    
+                    const taskElement = document.createElement('p');
+                    taskElement.textContent = task.task;
+    
+                    const completeButton = document.createElement('button');
+                    completeButton.textContent = 'Complete';
+                    completeButton.addEventListener('click', () => {
+                        patchTaskComplete(task.id);
+                    });
+    
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.addEventListener('click', () => {
+                        patchTaskDelete(task.id);
+                        tasksContainer.removeChild(taskDiv);
+                    });
+    
+                    taskDiv.appendChild(taskElement);
+                    taskDiv.appendChild(completeButton);
+                    taskDiv.appendChild(deleteButton);
+    
+                    tasksContainer.appendChild(taskDiv);
+                });
+            });
+    }
+    function patchTaskDelete(taskId) {
+        fetch(`http://127.0.0.1:8000/api/tasks/delete/${taskId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            
+            console.log('Task patched successfully');
+        })
+        .catch(error => {
+            console.error('There was a problem with the patch request:', error);
+        });
+    }
+    function patchTaskComplete(taskId) {
+        fetch(`http://127.0.0.1:8000/api/tasks/complete/${taskId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            
+            console.log('Task patched successfully');
+        })
+        .catch(error => {
+            console.error('There was a problem with the patch request:', error);
+        });
+    }
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+    window.addEventListener('load', fetchTasks);
 </script>
 
 </html>
