@@ -3,28 +3,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tasks</title>
+    
     <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
 </head>
 <body>
     {% if user.is_authenticated %}
         <h1>Task List</h1>
-    <form id="add-task-form" hx-post="{% url 'task-create' %}" hx-trigger="submit" hx-target="#task-list" hx-swap='afterend'>
+    <form id="add-task-form" hx-post="{% url 'task-create' %}" hx-trigger="submit" hx-target="#task-list" hx-swap="beforeend">
         <input type="text" name="task" placeholder="Enter task">
         <button type="submit">Add Task</button>
     </form>
-    <ul id="task-list" >
-        {% for task in tasks %}
-            <li><button hx-patch="{% url 'task-complete' task.id %}">Complete</button>  {{ task.task }}  
-                
-                <form hx-patch="{% url 'task-delete' task.id %}">
-                <button type="submit">Delete</button></li>
-                </form>
-        {% endfor %}
-    </ul>
     <hr>
-    <form hx-post="{% url 'logout' %}">
-        <button type="submit">Logout</button>
-    </form>
+
+    <div id="task-list" hx-get="{% url 'task-list' %}">
+        {% for task in tasks %}
+            <button hx-patch="{% url 'task-complete' task.id %} ">Complete</button> - <ul>{{task.task}}</ul> - <button hx-delete="{% url 'task-delete' task.id %} " id="delete-button">Delete</button> <br>
+        {% endfor %}
+    </div>
+
+    <hr>
+
+    <button class='text-base font-bold bg-red-500 hover:bg-red-600 text-white rounded' hx-post="{% url 'logout' %}">Logout</button>
+
     {% else %}
     <h1>Login</h1>
     <form hx-post="{% url 'login' %}">
@@ -50,9 +52,12 @@
     });
 
     document.body.addEventListener('htmx:afterRequest', (event) => {
-        document.querySelector("input.task").value = '';
+        document.querySelector("input[name='task']").value = '';
+        location.reload();
     });
+
 </script>
+
 </html>
 
 

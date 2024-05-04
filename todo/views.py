@@ -1,8 +1,10 @@
 from django.shortcuts import redirect, render
+from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from rest_framework.views import APIView
 from rest_framework import permissions, status
-from rest_framework.generics import UpdateAPIView
+from rest_framework.generics import DestroyAPIView, UpdateAPIView
 from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
 from .serializers import CompleteTaskSerializer, DeleteTaskSerializer, TaskSerializer, CreateTaskSerializer
 from .models import Task
 
@@ -11,25 +13,43 @@ from .models import Task
 class TaskAPIView(APIView):
     queryset = Task.objects.filter(is_active=True)
     permission_classes = (permissions.AllowAny,)
+    renderer_classes = [TemplateHTMLRenderer]
 
     def get(self, request):
         queryset = Task.objects.filter(is_active=True)
         serializer = TaskSerializer(queryset, many=True)
         context = {'tasks': serializer.data}
-        return render(request, 'index.html', context)
+        return Response(context, template_name='index.html')
     
     def post(self, request, *args, **kwargs):
         serializer = CreateTaskSerializer(data=request.data)
         if serializer.is_valid():
             serializer.validated_data['user_id'] = request.user.id
             serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(status=status.HTTP_201_CREATED, template_name=None)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class TaskDeleteAPIView(UpdateAPIView):
+class TaskDeleteAPIView(DestroyAPIView):
     serializer_class = DeleteTaskSerializer
+    queryset = Task.objects.filter(is_active=True)
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        task_id = self.kwargs.get('task_id')
+        task = Task.objects.get(id=task_id)
+        return task
+    
+    def delete(self, request, *args, **kwargs):
+        task = self.get_object()
+        task.is_active = False
+        task.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class TaskCompleteAPIView(UpdateAPIView):
+    serializer_class = CompleteTaskSerializer
     queryset = Task.objects.filter(is_active=True)
     permission_classes = [permissions.IsAuthenticated]
 
@@ -40,25 +60,8 @@ class TaskDeleteAPIView(UpdateAPIView):
     
     def update(self, request, *args, **kwargs):
         task = self.get_object()
-        task.is_active = False
-        task.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class TaskCompleteAPIView(UpdateAPIView):
-    serializer_class = CompleteTaskSerializer
-    queryset = Task.objects.filter(is_active=True)
-    permission_classes = (permissions.AllowAny,)
-
-    def get_object(self):
-        task_id = self.kwargs.get('task_id')
-        task = Task.objects.get(id=task_id)
-        return task
-    
-    def update(self, request, *args, **kwargs):
-        task = self.get_object()
         task.is_complete = True
         task.save()
-        serializer = self.get_serializer(task)
         return Response(status=status.HTTP_204_NO_CONTENT)
     
+
