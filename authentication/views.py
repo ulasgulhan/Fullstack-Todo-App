@@ -24,9 +24,9 @@ class LoginView(APIView):
         user = authenticate(username=username, password=password)
         if user:
             login(request, user)
-            return Response({'message': 'Login successful'}, status=status.HTTP_200_OK)
+            return Response(status=status.HTTP_200_OK)
         else:
-            return Response({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class LogoutView(APIView):
@@ -34,4 +34,4 @@ class LogoutView(APIView):
 
     def post(self, request):
         logout(request)
-        return redirect('task-list')
+        return Response(status=status.HTTP_204_NO_CONTENT)
