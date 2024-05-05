@@ -8,24 +8,27 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
-<body>
+<body >
     {% if user.is_authenticated %}
-        <h1>Task List</h1>
-    <form id="add-task-form" hx-post="{% url 'task-create' %}" hx-trigger="submit" hx-target="#task-list" hx-swap="beforeend">
-        <input type="text" name="task" placeholder="Enter task">
-        <button type="submit">Add Task</button>
-    </form>
-    <hr>
+    <section id="root">
+        <div class='flex flex-col items-center justify-center'>
+            <h1 class="mb-4">Task List</h1>
+            <form id="add-task-form" hx-post="{% url 'task-create' %}" hx-trigger="submit" hx-target="#task-list" hx-swap="beforeend" >
+                <input type="text" name="task" placeholder="Enter task" class="mb-2 px-4 py-2 border rounded">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add Task</button>
+            </form>
+        </div>
 
-    <div id="task-list">
+            <div id="task-list" class="flex flex-col items-center">
         
-    </div>
+            </div>
+            <hr>
+            <button type="submit" class='text-base font-bold bg-red-500 hover:bg-red-600 text-white rounded' hx-post="{% url 'logout' %}" onclick="reloadPage()">Logout</button>
 
-    
-    <hr>
 
-    <button type="submit" class='text-base font-bold bg-red-500 hover:bg-red-600 text-white rounded' hx-post="{% url 'logout' %}" onclick="reloadPage()">Logout</button>
 
+
+    </section>
     {% else %}
     <h1>Login</h1>
     <form hx-post="{% url 'login' %}" onsubmit="reloadPage()">
@@ -69,15 +72,16 @@
                 tasksContainer.innerHTML = '';
                 data.tasks.forEach(task => {
                     const taskDiv = document.createElement('div');
-    
-                    const taskElement = document.createElement('p');
-                    taskElement.textContent = task.task;
-    
+                    taskDiv.classList.add('flex', 'items-center', 'space-x-4', 'mb-4');
+
                     const completeButton = document.createElement('button');
                     completeButton.textContent = 'Complete';
                     completeButton.addEventListener('click', () => {
                         patchTaskComplete(task.id);
                     });
+
+                    const taskElement = document.createElement('p');
+                    taskElement.textContent = task.task;
     
                     const deleteButton = document.createElement('button');
                     deleteButton.textContent = 'Delete';
@@ -85,9 +89,9 @@
                         patchTaskDelete(task.id);
                         tasksContainer.removeChild(taskDiv);
                     });
-    
-                    taskDiv.appendChild(taskElement);
+
                     taskDiv.appendChild(completeButton);
+                    taskDiv.appendChild(taskElement);
                     taskDiv.appendChild(deleteButton);
     
                     tasksContainer.appendChild(taskDiv);
