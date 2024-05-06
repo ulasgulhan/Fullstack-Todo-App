@@ -8,8 +8,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
-<body >
+<body>
     {% if user.is_authenticated %}
+    <button type="submit" class='text-base font-bold bg-red-500 hover:bg-red-600 text-white rounded' hx-post="{% url 'logout' %}" onclick="reloadPage()">Logout</button>
+
+
     <section id="root">
         <div class='flex flex-col items-center justify-center'>
             <h1 class="mb-4">Task List</h1>
@@ -22,8 +25,7 @@
             <div id="task-list" class="flex flex-col items-center">
         
             </div>
-            <hr>
-            <button type="submit" class='text-base font-bold bg-red-500 hover:bg-red-600 text-white rounded' hx-post="{% url 'logout' %}" onclick="reloadPage()">Logout</button>
+
 
 
 
@@ -61,7 +63,7 @@
     function reloadPage() {
         setTimeout(() => {
             location.reload();
-        }, 500);
+        }, 1000);
     }
 
     function fetchTasks() {
@@ -84,10 +86,36 @@
 
                     const taskElement = document.createElement('p');
                     taskElement.textContent = task.task;
+                    taskElement.classList.add('overflowed');
                     if (task.is_complete) {
                         taskElement.style.textDecoration = 'line-through';
                         taskElement.style.color = 'green';
                     }
+
+                    taskElement.addEventListener('dblclick', () => {
+                        const editableTaskElement = document.createElement('input');
+                        editableTaskElement.type = 'text';
+                        editableTaskElement.value = task.task;
+                        editableTaskElement.classList.add('mb-2', 'px-4', 'py-2', 'border', 'rounded');
+                        
+                        editableTaskElement.addEventListener('blur', () => {
+                            const updatedTask = editableTaskElement.value.trim();
+                            if (updatedTask !== task.task) {
+                                patchTaskUpdate(task.id, updatedTask)
+                                    .then(() => fetchTasks());
+                            }
+                            taskDiv.replaceChild(taskElement, editableTaskElement);
+                        });
+                    
+                        editableTaskElement.addEventListener('keydown', (event) => {
+                            if (event.key === 'Enter') {
+                                editableTaskElement.blur();
+                            }
+                        });
+                    
+                        taskDiv.replaceChild(editableTaskElement, taskElement);
+                        editableTaskElement.focus();
+                    });
     
                     const deleteButton = document.createElement('button');
                     deleteButton.textContent = 'X';
@@ -102,6 +130,8 @@
                     taskDiv.appendChild(deleteButton);
     
                     tasksContainer.appendChild(taskDiv);
+
+
                 });
             });
     }
@@ -138,6 +168,26 @@
             }
             
             console.log('Task patched successfully');
+        })
+        .catch(error => {
+            console.error('There was a problem with the patch request:', error);
+        });
+    }
+
+    function patchTaskUpdate(taskId, updatedTask) {
+        return fetch(`/api/tasks/update/${taskId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ task: updatedTask })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            console.log('Task updated successfully');
         })
         .catch(error => {
             console.error('There was a problem with the patch request:', error);

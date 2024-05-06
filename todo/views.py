@@ -64,3 +64,20 @@ class TaskCompleteAPIView(UpdateAPIView):
         task.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+class TaskUpdateAPIView(UpdateAPIView):
+    serializer_class = TaskSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_object(self):
+        task_id = self.kwargs.get('task_id')
+        task = Task.objects.get(id=task_id)
+        return task
+    
+    def update(self, request, *args, **kwargs):
+        task = self.get_object()
+        updated_task = request.data.get('task')
+        task.task = updated_task
+        task.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
