@@ -65,7 +65,7 @@
     }
 
     function fetchTasks() {
-        fetch('http://127.0.0.1:8000/api/tasks/')
+        fetch('/api/tasks/')
             .then(response => response.json())
             .then(data => {
                 const tasksContainer = document.getElementById('task-list');
@@ -75,16 +75,23 @@
                     taskDiv.classList.add('flex', 'items-center', 'space-x-4', 'mb-4');
 
                     const completeButton = document.createElement('button');
-                    completeButton.textContent = 'Complete';
+                    completeButton.textContent = '✓';
+                    completeButton.classList.add('bg-blue-500', 'hover:bg-blue-700', 'text-white', 'font-bold', 'py-2', 'px-4', 'rounded');
                     completeButton.addEventListener('click', () => {
-                        patchTaskComplete(task.id);
+                        patchTaskComplete(task.id)
+                            .then(() => fetchTasks());
                     });
 
                     const taskElement = document.createElement('p');
                     taskElement.textContent = task.task;
+                    if (task.is_complete) {
+                        taskElement.style.textDecoration = 'line-through';
+                        taskElement.style.color = 'green';
+                    }
     
                     const deleteButton = document.createElement('button');
-                    deleteButton.textContent = 'Delete';
+                    deleteButton.textContent = 'X';
+                    deleteButton.classList.add('bg-red-500', 'hover:bg-red-700', 'text-white', 'font-bold', 'py-2', 'px-4', 'rounded');
                     deleteButton.addEventListener('click', () => {
                         patchTaskDelete(task.id);
                         tasksContainer.removeChild(taskDiv);
@@ -99,7 +106,7 @@
             });
     }
     function patchTaskDelete(taskId) {
-        fetch(`http://127.0.0.1:8000/api/tasks/delete/${taskId}`, {
+        fetch(`/api/tasks/delete/${taskId}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -118,7 +125,7 @@
         });
     }
     function patchTaskComplete(taskId) {
-        fetch(`http://127.0.0.1:8000/api/tasks/complete/${taskId}`, {
+        return fetch(`/api/tasks/complete/${taskId}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -136,6 +143,7 @@
             console.error('There was a problem with the patch request:', error);
         });
     }
+    
     function getCookie(name) {
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
