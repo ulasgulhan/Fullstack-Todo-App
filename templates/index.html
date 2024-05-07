@@ -8,22 +8,29 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
-<body >
+<body class='bg-gray-100'>
     {% if user.is_authenticated %}
     <button type="submit" class='text-base font-bold bg-red-500 hover:bg-red-600 text-white rounded' hx-post="{% url 'logout' %}" onclick="reloadPage()">Logout</button>
 
 
     <section id="root">
         <div class='flex flex-col items-center justify-center'>
+            <div class='flex flex-col items-center justify-center w-2/4'>   
             <h1 class="mb-4">Task List</h1>
             <form id="add-task-form" hx-post="{% url 'task-create' %}" hx-trigger="submit" hx-target="#task-list" hx-swap="beforeend" >
                 <input type="text" name="task" placeholder="Enter task" class="mb-2 px-4 py-2 border rounded">
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add Task</button>
             </form>
+            </div>
+        </div>
+
+        <div class="flex flex-row items-center justify-center mb-4">
+            <button onclick="fetchActiveTasks()" class="mr-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Active Tasks</button>
+            <button onclick="fetchCompletedTasks()" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Completed Tasks</button>
         </div>
         
         <div class="flex flex-col items-center justify-center">
-            <div id="task-list" class="w-2/4 bg-slate-700">
+            <div id="task-list" class="w-2/4 bg-gray-100">
         
             </div>
         </div>
@@ -41,7 +48,7 @@
             <div class="flex justify-center mb-8">
 
             <button onclick="showLoginForm()" class="mr-4 px-4 py-2 bg-blue-500 text-white rounded">Login</button>
-            <button onclick="showRegisterForm()" class="mr-4 px-4 py-2 bg-blue-500 text-white rounded">Register</button>
+            <button onclick="showRegisterForm()" class="px-4 py-2 bg-blue-500 text-white rounded">Register</button>
 
             </div>
             <div id="loginForm">
@@ -72,7 +79,7 @@
     });
     
     document.body.addEventListener('htmx:afterRequest', (event) => {
-        fetchTasks()
+        fetchActiveTasks()
         document.querySelector("input[name='task']").value = '';
     });
 
@@ -82,22 +89,27 @@
         }, 1000);
     }
 
-    function fetchTasks() {
-        fetch('/api/tasks/')
+    function fetchTasks(url) {
+        fetch(url)
             .then(response => response.json())
             .then(data => {
                 const tasksContainer = document.getElementById('task-list');
                 tasksContainer.innerHTML = '';
                 data.tasks.forEach(task => {
                     const taskDiv = document.createElement('div');
-                    taskDiv.classList.add('flex', 'items-center', 'space-x-4', 'mb-4', 'flex', 'flex-wrap', 'whitespace-normal', 'break-all', 'justify-between', 'w-full');
+                    taskDiv.classList.add('flex', 'items-center', 'space-x-4', 'mb-4', 'flex', 'flex-wrap', 'whitespace-normal', 'break-all', 'justify-between', 'w-full', 'shadow-md', 'bg-gray-200');
 
                     const completeButton = document.createElement('button');
                     completeButton.textContent = '✓';
                     completeButton.classList.add('bg-blue-500', 'hover:bg-blue-700', 'text-white', 'font-bold', 'py-2', 'px-4', 'rounded');
                     completeButton.addEventListener('click', () => {
-                        patchTaskComplete(task.id)
-                            .then(() => fetchTasks());
+                        if (task.is_complete === true) {
+                            patchTaskComplete(task.id)
+                                .then(() => fetchCompletedTasks());
+                        } else {
+                            patchTaskComplete(task.id)
+                                .then(() => fetchActiveTasks());
+                        }
                     });
 
                     const taskElement = document.createElement('p');
@@ -118,7 +130,7 @@
                             const updatedTask = editableTaskElement.value.trim();
                             if (updatedTask !== task.task) {
                                 patchTaskUpdate(task.id, updatedTask)
-                                    .then(() => fetchTasks());
+                                    .then(() => fetchActiveTasks());
                             }
                             taskDiv.replaceChild(taskElement, editableTaskElement);
                         });
@@ -225,7 +237,15 @@
         document.getElementById('loginForm').style.display = 'none';
         document.getElementById('registerForm').style.display = 'block';
     }
-    window.addEventListener('load', fetchTasks);
+
+    function fetchCompletedTasks() {
+        fetchTasks('/api/tasks/completed/');
+    }
+
+    function fetchActiveTasks() {
+        fetchTasks('/api/tasks/');
+    }
+    window.addEventListener('load', fetchActiveTasks);
 </script>
 
 </html>

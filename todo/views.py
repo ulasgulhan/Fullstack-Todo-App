@@ -16,7 +16,7 @@ class TaskAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def get(self, request):
-        queryset = Task.objects.filter(is_active=True)
+        queryset = Task.objects.filter(is_active=True, is_complete=False)
         serializer = TaskSerializer(queryset, many=True)
         context = {'tasks': serializer.data}
         return Response(context)
@@ -60,7 +60,10 @@ class TaskCompleteAPIView(UpdateAPIView):
     
     def update(self, request, *args, **kwargs):
         task = self.get_object()
-        task.is_complete = True
+        if task.is_complete:
+            task.is_complete = False
+        else:
+            task.is_complete = True
         task.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -80,4 +83,14 @@ class TaskUpdateAPIView(UpdateAPIView):
         task.task = updated_task
         task.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class GetCompleteedTasksAPIView(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def get(self, request):
+        queryset = Task.objects.filter(is_active=True, is_complete=True)
+        serializer = TaskSerializer(queryset, many=True)
+        context = {'tasks': serializer.data}
+        return Response(context)
 
