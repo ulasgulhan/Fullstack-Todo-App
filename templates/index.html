@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
-<body>
+<body >
     {% if user.is_authenticated %}
     <button type="submit" class='text-base font-bold bg-red-500 hover:bg-red-600 text-white rounded' hx-post="{% url 'logout' %}" onclick="reloadPage()">Logout</button>
 
@@ -21,10 +21,12 @@
                 <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add Task</button>
             </form>
         </div>
-
-            <div id="task-list" class="flex flex-col items-center">
+        
+        <div class="flex flex-col items-center justify-center">
+            <div id="task-list" class="w-2/4 bg-slate-700">
         
             </div>
+        </div>
 
 
 
@@ -32,22 +34,36 @@
 
     </section>
     {% else %}
-    <h1>Login</h1>
-    <form hx-post="{% url 'login' %}" onsubmit="reloadPage()">
-        <input type="text" name="username" placeholder="Username" required><br>
-        <input type="password" name="password" placeholder="Password" required><br>
-        <button type="submit">Login</button>
-    </form>
 
-    <hr>
 
-    <h1>Register</h1>
-    <form hx-post="{% url 'register' %}">
-        <input type="text" name="username" placeholder="Username" required><br>
-        <input type="email" name="email" placeholder="Email" required><br>
-        <input type="password" name="password" placeholder="Password" required><br>
-        <button type="submit">Register</button>
-    </form>
+    <div class="bg-gray-100 flex justify-center items-center h-screen">
+        <div class="bg-white p-8 rounded shadow-md">
+            <div class="flex justify-center mb-8">
+
+            <button onclick="showLoginForm()" class="mr-4 px-4 py-2 bg-blue-500 text-white rounded">Login</button>
+            <button onclick="showRegisterForm()" class="mr-4 px-4 py-2 bg-blue-500 text-white rounded">Register</button>
+
+            </div>
+            <div id="loginForm">
+                <h1>Login</h1>
+                <form hx-post="{% url 'login' %}" onsubmit="reloadPage()">
+                    <input type="text" name="username" placeholder="Username" required class="mb-2 px-4 py-2 border border-gray-300 rounded w-full"><br>
+                    <input type="password" name="password" placeholder="Password" required class="mb-2 px-4 py-2 border border-gray-300 rounded w-full"><br>
+                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded w-full">Login</button>
+                </form>
+            </div>
+
+            <div id="registerForm" style="display: none;">
+                <h1>Register</h1>
+                <form hx-post="{% url 'register' %}">
+                    <input type="text" name="username" placeholder="Username" required class="mb-2 px-4 py-2 border border-gray-300 rounded w-full"><br>
+                    <input type="email" name="email" placeholder="Email" required class="mb-2 px-4 py-2 border border-gray-300 rounded w-full"><br>
+                    <input type="password" name="password" placeholder="Password" required class="mb-2 px-4 py-2 border border-gray-300 rounded w-full"><br>
+                    <button type="submit" class="px-4 py-2 bg-blue-500 text-white rounded w-full">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
     {% endif %}
 </body>
 <script>
@@ -74,7 +90,7 @@
                 tasksContainer.innerHTML = '';
                 data.tasks.forEach(task => {
                     const taskDiv = document.createElement('div');
-                    taskDiv.classList.add('flex', 'items-center', 'space-x-4', 'mb-4');
+                    taskDiv.classList.add('flex', 'items-center', 'space-x-4', 'mb-4', 'flex', 'flex-wrap', 'whitespace-normal', 'break-all', 'justify-between', 'w-full');
 
                     const completeButton = document.createElement('button');
                     completeButton.textContent = '✓';
@@ -86,7 +102,7 @@
 
                     const taskElement = document.createElement('p');
                     taskElement.textContent = task.task;
-                    taskElement.classList.add('overflowed');
+                    taskElement.classList.add('text-center', 'flex-grow', 'max-w-[calc(100%-10rem)]');
                     if (task.is_complete) {
                         taskElement.style.textDecoration = 'line-through';
                         taskElement.style.color = 'green';
@@ -198,6 +214,16 @@
         const value = `; ${document.cookie}`;
         const parts = value.split(`; ${name}=`);
         if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    function showLoginForm() {
+        document.getElementById('loginForm').style.display = 'block';
+        document.getElementById('registerForm').style.display = 'none';
+    }
+
+    function showRegisterForm() {
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('registerForm').style.display = 'block';
     }
     window.addEventListener('load', fetchTasks);
 </script>
