@@ -7,30 +7,51 @@
     <script src="https://unpkg.com/htmx.org@1.9.12" integrity="sha384-ujb1lZYygJmzgSwoxRggbCHcjc0rB2XoQrxeTUQyRjrOnlCoYta87iKBWq3EsdM2" crossorigin="anonymous"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap');
+        .font-poppins {
+          font-family: 'Poppins', sans-serif;
+        }
+    </style>
+
 </head>
-<body class='bg-gray-100'>
+<body class='bg-gray-100 font-poppins'>
     {% if user.is_authenticated %}
-    <button type="submit" class='text-base font-bold bg-red-500 hover:bg-red-600 text-white rounded' hx-post="{% url 'logout' %}" onclick="reloadPage()">Logout</button>
 
 
     <section id="root">
+        <nav class="flex flex-row bg-gray-800 p-4 mb-8">
+            <div class="container flex justify-between items-center">
+                <div class="text-white font-semibold ml-8 w-full ">
+                  <p class="text-xl">Ulaş Gülhan's Task List</p>
+                </div>
+            </div>
+            <button type="submit" class='text-white hover:text-gray-300' hx-post="{% url 'logout' %}" onclick="reloadPage()">Logout</button>
+        </nav>
+        
+
         <div class='flex flex-col items-center justify-center'>
-            <div class='flex flex-col items-center justify-center w-2/4'>   
-            <h1 class="mb-4">Task List</h1>
-            <form id="add-task-form" hx-post="{% url 'task-create' %}" hx-trigger="submit" hx-target="#task-list" hx-swap="beforeend" >
-                <input type="text" name="task" placeholder="Enter task" class="mb-2 px-4 py-2 border rounded">
-                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Add Task</button>
+            <div class='flex flex-col items-center justify-center w-2/4'>
+            <form id="add-task-form" hx-post="{% url 'task-create' %}" hx-trigger="submit" hx-target="#task-list" hx-swap="beforeend" class="w-full flex">
+                <input type="text" name="task" placeholder="Enter task" class="mb-2 flex-grow px-4 py-2 border rounded mr-2 h-10">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded h-10">Add Task</button>
             </form>
             </div>
         </div>
 
-        <div class="flex flex-row items-center justify-center mb-4">
-            <button onclick="fetchActiveTasks()" class="mr-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Active Tasks</button>
-            <button onclick="fetchCompletedTasks()" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Completed Tasks</button>
+        <div class='flex flex-row items-center justify-center'>
+            <div class="w-2/4 bg-gray-200 flex justify-center">
+                <button id='activeTasksBtn' onclick="fetchActiveTasks()" class="my-2 mr-4 border-2 border-blue-500 hover:bg-blue-500 hover:text-white font-bold py-2 px-4 rounded">Active Tasks</button>
+                <button id="completedTasksBtn"  onclick="fetchCompletedTasks()" class="my-2 border-2 border-green-500 hover:bg-green-500 hover:text-white font-bold py-2 px-4 rounded">Completed Tasks</button>
+            </div>
         </div>
+        <div class='flex flex-row items-center justify-center'>
+            <hr class='w-2/4 border border-white border-b'>
+        </div>
+
         
         <div class="flex flex-col items-center justify-center">
-            <div id="task-list" class="w-2/4 bg-gray-100">
+            <div id="task-list" class="w-2/4 bg-gray-200">
         
             </div>
         </div>
@@ -43,8 +64,10 @@
     {% else %}
 
 
-    <div class="bg-gray-100 flex justify-center items-center h-screen">
+    <div class="bg-gray-100 flex flex-col justify-center items-center h-screen">
+        <p class='mb-4'>Welcome!</p>
         <div class="bg-white p-8 rounded shadow-md">
+            <p id="formTitle" class="flex justify-center mb-8">Login to your account</p>
             <div class="flex justify-center mb-8">
 
             <button onclick="showLoginForm()" class="mr-4 px-4 py-2 bg-blue-500 text-white rounded">Login</button>
@@ -52,6 +75,7 @@
 
             </div>
             <div id="loginForm">
+                <div id="registerSuccess" style="display: none;">Registration successful. Redirecting to login...</div>
                 <h1>Login</h1>
                 <form hx-post="{% url 'login' %}" onsubmit="reloadPage()">
                     <input type="text" name="username" placeholder="Username" required class="mb-2 px-4 py-2 border border-gray-300 rounded w-full"><br>
@@ -62,7 +86,7 @@
 
             <div id="registerForm" style="display: none;">
                 <h1>Register</h1>
-                <form hx-post="{% url 'register' %}">
+                <form hx-post="{% url 'register' %}" onsubmit='getLoginAfterRegister()'>
                     <input type="text" name="username" placeholder="Username" required class="mb-2 px-4 py-2 border border-gray-300 rounded w-full"><br>
                     <input type="email" name="email" placeholder="Email" required class="mb-2 px-4 py-2 border border-gray-300 rounded w-full"><br>
                     <input type="password" name="password" placeholder="Password" required class="mb-2 px-4 py-2 border border-gray-300 rounded w-full"><br>
@@ -86,7 +110,13 @@
     function reloadPage() {
         setTimeout(() => {
             location.reload();
-        }, 1000);
+        }, 1500);
+    }
+
+    function getLoginAfterRegister() {
+        document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('registerSuccess').style.display = 'block'; 
+        setTimeout(() => { showLoginForm(); }, 1500); 
     }
 
     function fetchTasks(url) {
@@ -97,24 +127,33 @@
                 tasksContainer.innerHTML = '';
                 data.tasks.forEach(task => {
                     const taskDiv = document.createElement('div');
-                    taskDiv.classList.add('flex', 'items-center', 'space-x-4', 'mb-4', 'flex', 'flex-wrap', 'whitespace-normal', 'break-all', 'justify-between', 'w-full', 'shadow-md', 'bg-gray-200');
+                    taskDiv.classList.add('flex', 'items-center', 'space-x-4', 'my-4', 'flex', 'flex-wrap', 'whitespace-normal', 'break-words', 'justify-between', 'w-full', 'bg-gray-200');
 
                     const completeButton = document.createElement('button');
-                    completeButton.textContent = '✓';
-                    completeButton.classList.add('bg-blue-500', 'hover:bg-blue-700', 'text-white', 'font-bold', 'py-2', 'px-4', 'rounded');
+                    completeButton.innerHTML = '&#10004;';
+                    completeButton.classList.add('complete-btn', 'border-2', 'border-blue-500', 'rounded-full', 'w-10', 'h-10', 'flex', 'items-center', 'justify-center', 'hover:bg-green-500', 'hover:border-green-500', 'hover:text-white', 'ml-4');
+                    if (task.is_complete) {
+                        completeButton.classList.add('bg-green-500', 'border-green-500', 'text-white');
+                    }
                     completeButton.addEventListener('click', () => {
-                        if (task.is_complete === true) {
+                        if (!task.is_complete) {
                             patchTaskComplete(task.id)
-                                .then(() => fetchCompletedTasks());
+                                .then(() => {
+                                    fetchActiveTasks();
+                                    completeButton.classList.add('bg-green-500', 'text-white');
+                                });
                         } else {
                             patchTaskComplete(task.id)
-                                .then(() => fetchActiveTasks());
+                                .then(() => {
+                                    fetchCompletedTasks();
+                                    completeButton.classList.remove('bg-green-500', 'text-white');
+                                });
                         }
                     });
 
                     const taskElement = document.createElement('p');
                     taskElement.textContent = task.task;
-                    taskElement.classList.add('text-center', 'flex-grow', 'max-w-[calc(100%-10rem)]');
+                    taskElement.classList.add('text-left', 'flex-grow', 'max-w-[calc(100%-14rem)]');
                     if (task.is_complete) {
                         taskElement.style.textDecoration = 'line-through';
                         taskElement.style.color = 'green';
@@ -124,7 +163,7 @@
                         const editableTaskElement = document.createElement('input');
                         editableTaskElement.type = 'text';
                         editableTaskElement.value = task.task;
-                        editableTaskElement.classList.add('mb-2', 'px-4', 'py-2', 'border', 'rounded');
+                        editableTaskElement.classList.add('flex-grow', 'mb-2', 'px-4', 'py-2', 'border', 'rounded');
                         
                         editableTaskElement.addEventListener('blur', () => {
                             const updatedTask = editableTaskElement.value.trim();
@@ -146,18 +185,22 @@
                     });
     
                     const deleteButton = document.createElement('button');
-                    deleteButton.textContent = 'X';
-                    deleteButton.classList.add('bg-red-500', 'hover:bg-red-700', 'text-white', 'font-bold', 'py-2', 'px-4', 'rounded');
+                    deleteButton.textContent = 'Delete';
+                    deleteButton.classList.add('bg-red-500', 'hover:bg-red-700', 'text-white', 'font-bold', 'py-2', 'px-4', 'rounded', 'mr-10');
                     deleteButton.addEventListener('click', () => {
                         patchTaskDelete(task.id);
                         tasksContainer.removeChild(taskDiv);
                     });
 
+                    const hr = document.createElement('hr');
+                    hr.classList.add('border', 'border-white', 'border-b');
+
                     taskDiv.appendChild(completeButton);
                     taskDiv.appendChild(taskElement);
                     taskDiv.appendChild(deleteButton);
-    
+
                     tasksContainer.appendChild(taskDiv);
+                    tasksContainer.appendChild(hr);
 
 
                 });
@@ -229,21 +272,33 @@
     }
 
     function showLoginForm() {
+        document.getElementById('formTitle').innerText = 'Login to your account';
         document.getElementById('loginForm').style.display = 'block';
         document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('registerSuccess').style.display = 'none';
     }
 
     function showRegisterForm() {
+        document.getElementById('formTitle').innerText = 'Create an account';
         document.getElementById('loginForm').style.display = 'none';
         document.getElementById('registerForm').style.display = 'block';
+        document.getElementById('registerSuccess').style.display = 'none';
     }
 
     function fetchCompletedTasks() {
         fetchTasks('/api/tasks/completed/');
+        document.getElementById('completedTasksBtn').classList.add('bg-green-500', 'text-white');
+        document.getElementById('completedTasksBtn').classList.remove('text-black');
+        document.getElementById('activeTasksBtn').classList.remove('bg-blue-500', 'text-white');
+        document.getElementById('activeTasksBtn').classList.add('text-black');
     }
 
     function fetchActiveTasks() {
         fetchTasks('/api/tasks/');
+        document.getElementById('activeTasksBtn').classList.add('bg-blue-500', 'text-white');
+        document.getElementById('activeTasksBtn').classList.remove('text-black');
+        document.getElementById('completedTasksBtn').classList.remove('bg-green-500', 'text-white');
+        document.getElementById('completedTasksBtn').classList.add('text-black');
     }
     window.addEventListener('load', fetchActiveTasks);
 </script>
