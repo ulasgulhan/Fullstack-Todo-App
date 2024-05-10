@@ -3,6 +3,7 @@
 ## Overview
 This is a simple Todo web application built to help users manage their tasks efficiently. Users can add, delete, mark tasks as complete, and update existing tasks using this application.
 
+
 ## Features
 **Add Tasks:** Easily add new tasks to your list.
 
@@ -18,3 +19,34 @@ This is a simple Todo web application built to help users manage their tasks eff
 **Backend:** Django Web Framework, Django Rest Framework
 
 **Database:** SQLite
+
+
+## Requirements
+* Python 3.11+
+* Django 5.0+
+
+
+## Building the Project
+```sh
+    $ docker-compose up
+```
+
+**or**
+
+```sh
+    $ python manage.py runserver
+```
+
+
+## Code Formatting
+This project uses black formatter. You can use this command to format your code:
+- Format all files
+```sh
+    $ black .
+```
+- Format a single file
+```sh
+    $ black <file_name>
+```
+Detailed information about black formatter: https://github.com/psf/black
+

@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  base:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    command: 'false'
+
+  app:
+    extends:
+      service: base
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+
+  makemigrations:
+    extends:
+      service: base
+    command: python manage.py makemigrations
+    depends_on:
+      - app
+
+  migrate:
+    extends:
+      service: base
+    command: python manage.py migrate
+    depends_on:
+      - makemigrations
+      - app
