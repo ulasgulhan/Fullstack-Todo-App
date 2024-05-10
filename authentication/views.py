@@ -1,10 +1,8 @@
 from django.contrib.auth.models import User
-from django.shortcuts import redirect, render
 from rest_framework import permissions, status
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, login, logout
 from .serializer import UserSerializer
 

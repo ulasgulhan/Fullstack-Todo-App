@@ -1,11 +1,7 @@
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import redirect, render
-from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from rest_framework.views import APIView
 from rest_framework import permissions, status
-from rest_framework.generics import DestroyAPIView, UpdateAPIView
+from rest_framework.generics import UpdateAPIView
 from rest_framework.response import Response
-from rest_framework.viewsets import ModelViewSet
 from .serializers import (
     CompleteTaskSerializer,
     DeleteTaskSerializer,
@@ -42,7 +38,7 @@ class TaskAPIView(APIView):
 class TaskDeleteAPIView(UpdateAPIView):
     serializer_class = DeleteTaskSerializer
     queryset = Task.objects.filter(is_active=True)
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get_object(self):
         task_id = self.kwargs.get("task_id")
@@ -58,8 +54,7 @@ class TaskDeleteAPIView(UpdateAPIView):
 
 class DeleteAllCompletedTasksAPIView(UpdateAPIView):
     serializer_class = DeleteTaskSerializer
-    queryset = Task.objects.filter(is_active=True)
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
         queryset = Task.objects.filter(is_active=True, is_complete=True)
@@ -75,8 +70,7 @@ class DeleteAllCompletedTasksAPIView(UpdateAPIView):
 
 class TaskCompleteAPIView(UpdateAPIView):
     serializer_class = CompleteTaskSerializer
-    queryset = Task.objects.filter(is_active=True)
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get_object(self):
         task_id = self.kwargs.get("task_id")
@@ -95,7 +89,7 @@ class TaskCompleteAPIView(UpdateAPIView):
 
 class TaskUpdateAPIView(UpdateAPIView):
     serializer_class = TaskSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get_object(self):
         task_id = self.kwargs.get("task_id")
@@ -111,7 +105,7 @@ class TaskUpdateAPIView(UpdateAPIView):
 
 
 class GetCompleteedTasksAPIView(APIView):
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request):
         queryset = Task.objects.filter(is_active=True, is_complete=True)

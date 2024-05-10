@@ -1,5 +1,5 @@
+
 function submitRegisterForm() {
-    event.preventDefault();
     var username = document.getElementById("registerUsername").value;
     fetch("/auth/register/", {
         method: 'POST',
@@ -27,10 +27,12 @@ function submitRegisterForm() {
     return false;
 }
 
+
 document.body.addEventListener('htmx:afterRequest', (event) => {
     fetchActiveTasks()
     document.querySelector("input[name='task']").value = '';
 });
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.querySelector("#registerForm");
@@ -48,11 +50,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+
 function reloadPage() {
     setTimeout(() => {
         location.reload();
     }, 1500);
 }
+
 
 function getLoginAfterRegister() {
     console.log("getLoginAfterRegister function called");
@@ -60,6 +64,7 @@ function getLoginAfterRegister() {
     document.getElementById('registerSuccess').style.display = 'block'; 
     setTimeout(() => { showLoginForm(); }, 1500); 
 }
+
 
 function fetchTasks(url) {
     fetch(url)
@@ -75,7 +80,7 @@ function fetchTasks(url) {
 
                 const completeButton = document.createElement('button');
                 completeButton.innerHTML = '&#10004;';
-                completeButton.classList.add('complete-btn', 'text-[#363639]', 'border-2', 'border-[#363639]', 'rounded-full', 'w-7', 'h-7', 'flex', 'items-center', 'justify-center', 'hover:bg-[#E6F8F1]', 'hover:border-[#60A688]', 'hover:text-[#60A688]', 'ml-4');
+                completeButton.classList.add('text-[#363639]', 'border-2', 'border-[#363639]', 'rounded-full', 'w-7', 'h-7', 'flex', 'justify-center', 'hover:bg-[#E6F8F1]', 'hover:border-[#60A688]', 'hover:text-[#60A688]', 'ml-4');
                 if (task.is_complete) {
                     completeButton.classList.remove('border-[#363639]');
                     completeButton.classList.add('bg-[#E6F8F1]', 'border-[#60A688]', 'text-[#60A688]', 'hover:bg-transparent', 'hover:border-[#363639]', 'hover:text-[#363639]');
@@ -158,6 +163,8 @@ function fetchTasks(url) {
             });
         });
 }
+
+
 function patchTaskDelete(taskId) {
     fetch(`/api/tasks/delete/${taskId}`, {
         method: 'PATCH',
@@ -177,6 +184,8 @@ function patchTaskDelete(taskId) {
         console.error('There was a problem with the patch request:', error);
     });
 }
+
+
 function patchTaskComplete(taskId) {
     return fetch(`/api/tasks/complete/${taskId}`, {
         method: 'PATCH',
@@ -196,6 +205,7 @@ function patchTaskComplete(taskId) {
         console.error('There was a problem with the patch request:', error);
     });
 }
+
 
 function patchTaskUpdate(taskId, updatedTask) {
     return fetch(`/api/tasks/update/${taskId}`, {
@@ -217,11 +227,13 @@ function patchTaskUpdate(taskId, updatedTask) {
     });
 }
 
+
 function getCookie(name) {
     const value = `; ${document.cookie}`;
     const parts = value.split(`; ${name}=`);
     if (parts.length === 2) return parts.pop().split(';').shift();
 }
+
 
 function showLoginForm() {
     document.getElementById('formTitle').innerText = 'Login to your account';
@@ -230,10 +242,12 @@ function showLoginForm() {
     document.getElementById('registerSuccess').style.display = 'none';
 }
 
+
 function loginSuccess(){
     document.getElementById('loginForm').style.display = 'none';
     document.getElementById('loginSuccess').style.display = 'block';
 }
+
 
 function showRegisterForm() {
     document.getElementById('formTitle').innerText = 'Create an account';
@@ -243,6 +257,7 @@ function showRegisterForm() {
     document.getElementById('registerError').style.display = 'none';
 }
 
+
 function fetchCompletedTasks() {
     fetchTasks('/api/tasks/completed/');
     document.getElementById('completedTasksBtn').classList.add('bg-[#2BA470]', 'text-white');
@@ -251,6 +266,7 @@ function fetchCompletedTasks() {
     document.getElementById('activeTasksBtn').classList.add('text-black');
 }
 
+
 function fetchActiveTasks() {
     fetchTasks('/api/tasks/');
     document.getElementById('activeTasksBtn').classList.add('bg-[#3C46FF]', 'text-white');
@@ -258,5 +274,6 @@ function fetchActiveTasks() {
     document.getElementById('completedTasksBtn').classList.remove('bg-[#2BA470]', 'text-white');
     document.getElementById('completedTasksBtn').classList.add('text-black');
 }
-window.addEventListener('load', fetchActiveTasks);
+
+
 window.addEventListener('load', fetchActiveTasks);
