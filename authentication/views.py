@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.shortcuts import redirect, render
 from rest_framework import permissions, status
 from rest_framework.generics import CreateAPIView
@@ -16,10 +17,15 @@ class RegisterView(CreateAPIView):
     permission_classes = [permissions.AllowAny]
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        username = request.data.get('username', None)
+        user = User.objects.filter(username=username)
+        if user.exists():
+            return Response({"error": "Username already exists."}, status=status.HTTP_406_NOT_ACCEPTABLE)
+        else:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
 class LoginView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -40,4 +46,5 @@ class LogoutView(APIView):
 
     def post(self, request):
         logout(request)
-        return Response(status=status.HTTP_200_OK)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+

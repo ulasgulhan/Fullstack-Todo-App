@@ -1,4 +1,4 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from rest_framework.renderers import JSONRenderer, TemplateHTMLRenderer
 from rest_framework.views import APIView
@@ -12,7 +12,6 @@ from .models import Task
 # Create your views here.
 
 class TaskAPIView(APIView):
-    queryset = Task.objects.filter(is_active=True)
     permission_classes = (permissions.AllowAny,)
 
     def get(self, request):
@@ -45,6 +44,23 @@ class TaskDeleteAPIView(UpdateAPIView):
         task = self.get_object()
         task.is_active = False
         task.save()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class DeleteAllCompletedTasksAPIView(UpdateAPIView):
+    serializer_class = DeleteTaskSerializer
+    queryset = Task.objects.filter(is_active=True)
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        queryset = Task.objects.filter(is_active=True, is_complete=True)
+        return queryset
+    
+    def update(self, request, *args, **kwargs):
+        tasks = self.get_queryset()
+        for task in tasks:
+            task.is_active = False
+            task.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
@@ -93,4 +109,3 @@ class GetCompleteedTasksAPIView(APIView):
         serializer = TaskSerializer(queryset, many=True)
         context = {'tasks': serializer.data}
         return Response(context)
-
