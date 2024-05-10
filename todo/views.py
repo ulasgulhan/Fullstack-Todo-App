@@ -13,6 +13,15 @@ from .models import Task
 # Create your views here.
 
 
+class ShowAllTasksAPIView(APIView):
+    permission_classes = (permissions.AllowAny,)
+
+    def get(self, request):
+        queryset = Task.objects.all()
+        serializer = TaskSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+
 class TaskAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 

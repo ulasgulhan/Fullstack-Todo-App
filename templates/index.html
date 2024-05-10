@@ -20,7 +20,7 @@
 
 
     <section id="root">
-        <nav class="flex flex-row bg-gradient-to-r from-[#5B073A] to-[#673252] p-8 mb-8">
+        <nav class="flex flex-row bg-transparent p-8 mb-8">
 
             <div class="container flex justify-between items-center">
                 <div class='text-white w-36'>
@@ -44,7 +44,7 @@
         </div>
 
         <div class='flex flex-row items-center justify-center'>
-            <div class="w-2/4 bg-[#FFFFFF] flex justify-center border-[#EDEAE9] border-b">
+            <div class="w-2/4 bg-white flex justify-center border-[#EDEAE9] border-b">
                 <button id='activeTasksBtn' onclick="fetchActiveTasks()" class="my-2 mr-4 border-2 border-[#3C46FF] hover:bg-[#3C46FF] hover:text-white font-medium py-2 px-4 rounded">&#9733;&nbsp; Active Tasks</button>
                 <button id="completedTasksBtn"  onclick="fetchCompletedTasks()" class="my-2 mr-4 border-2 border-[#2BA470] hover:bg-[#2BA470] hover:text-white font-medium py-2 px-4 rounded">&#10004;&nbsp; Completed Tasks</button>
                 <button hx-put="{% url 'task-complete-delete' %}" class="font-medium rounded"><p class='border-b border-[#EB7586] hover:border-[#D93256] hover:text-[#D93256] text-[#EB7586]'>&#10006;&nbsp; Delete Completed Tasks</p></button>
@@ -57,7 +57,8 @@
             </div>
         </div>
 
-
+        <footer class='flex flex-col items-center justify-center my-8'>
+        </footer>
     </section>
     {% else %}
 

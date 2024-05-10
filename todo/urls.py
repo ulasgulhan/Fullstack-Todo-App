@@ -3,7 +3,8 @@ from . import views
 
 
 urlpatterns = [
-    path("tasks/", views.TaskAPIView.as_view(), name="task-list"),
+    path("tasks/", views.ShowAllTasksAPIView.as_view(), name="task"),
+    path("tasks/active", views.TaskAPIView.as_view(), name="task-list"),
     path("tasks/create", views.TaskAPIView.as_view(), name="task-create"),
     path(
         "tasks/delete/<int:task_id>",

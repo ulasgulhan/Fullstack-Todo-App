@@ -76,7 +76,7 @@ function fetchTasks(url) {
             tasksCountContainer.innerHTML = `Active Tasks: ${data.active_task_count}`;
             data.tasks.forEach(task => {
                 const taskDiv = document.createElement('div');
-                taskDiv.classList.add('flex', 'items-center', 'space-x-4', 'flex', 'flex-wrap', 'whitespace-normal', 'break-words', 'justify-between', 'w-full', 'bg-[#FFFFFF]', 'hover:bg-[#F8F7F7]', 'border-[#EDEAE9]', 'border-b');
+                taskDiv.classList.add('flex', 'items-center', 'space-x-4', 'flex', 'flex-wrap', 'whitespace-normal', 'break-all', 'justify-between', 'w-full', 'bg-white', 'hover:bg-[#F8F7F7]', 'border-[#EDEAE9]', 'border-b');
 
                 const completeButton = document.createElement('button');
                 completeButton.innerHTML = '&#10004;';
@@ -268,7 +268,7 @@ function fetchCompletedTasks() {
 
 
 function fetchActiveTasks() {
-    fetchTasks('/api/tasks/');
+    fetchTasks('/api/tasks/active');
     document.getElementById('activeTasksBtn').classList.add('bg-[#3C46FF]', 'text-white');
     document.getElementById('activeTasksBtn').classList.remove('text-black');
     document.getElementById('completedTasksBtn').classList.remove('bg-[#2BA470]', 'text-white');
