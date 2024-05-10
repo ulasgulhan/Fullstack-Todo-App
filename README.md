@@ -37,6 +37,16 @@ This is a simple Todo web application built to help users manage their tasks eff
     $ python manage.py runserver
 ```
 
+## Superuser Data
+
+- Superuser Username
+```sh
+    admin
+```
+- Superuser password
+```sh
+    123
+```
 
 ## Code Formatting
 This project uses black formatter. You can use this command to format your code:
