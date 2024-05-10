@@ -7,21 +7,28 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Task',
+            name="Task",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('task', models.CharField(max_length=300)),
-                ('is_complete', models.BooleanField(default=False)),
-                ('is_active', models.BooleanField(default=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("task", models.CharField(max_length=300)),
+                ("is_complete", models.BooleanField(default=False)),
+                ("is_active", models.BooleanField(default=True)),
             ],
             options={
-                'verbose_name': 'Task',
-                'verbose_name_plural': 'Tasks',
+                "verbose_name": "Task",
+                "verbose_name_plural": "Tasks",
             },
         ),
     ]

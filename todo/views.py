@@ -6,25 +6,33 @@ from rest_framework import permissions, status
 from rest_framework.generics import DestroyAPIView, UpdateAPIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
-from .serializers import CompleteTaskSerializer, DeleteTaskSerializer, TaskSerializer, CreateTaskSerializer
+from .serializers import (
+    CompleteTaskSerializer,
+    DeleteTaskSerializer,
+    TaskSerializer,
+    CreateTaskSerializer,
+)
 from .models import Task
 
 # Create your views here.
+
 
 class TaskAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def get(self, request):
         queryset = Task.objects.filter(is_active=True, is_complete=False)
-        active_task_count = Task.objects.filter(is_active=True, is_complete=False).count()
+        active_task_count = Task.objects.filter(
+            is_active=True, is_complete=False
+        ).count()
         serializer = TaskSerializer(queryset, many=True)
-        context = {'tasks': serializer.data, 'active_task_count': active_task_count}
+        context = {"tasks": serializer.data, "active_task_count": active_task_count}
         return Response(context)
-    
+
     def post(self, request, *args, **kwargs):
         serializer = CreateTaskSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.validated_data['user_id'] = request.user.id
+            serializer.validated_data["user_id"] = request.user.id
             serializer.save()
             return Response(status=status.HTTP_201_CREATED, template_name=None)
         else:
@@ -37,10 +45,10 @@ class TaskDeleteAPIView(UpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
-        task_id = self.kwargs.get('task_id')
+        task_id = self.kwargs.get("task_id")
         task = Task.objects.get(id=task_id)
         return task
-    
+
     def update(self, request, *args, **kwargs):
         task = self.get_object()
         task.is_active = False
@@ -56,7 +64,7 @@ class DeleteAllCompletedTasksAPIView(UpdateAPIView):
     def get_queryset(self):
         queryset = Task.objects.filter(is_active=True, is_complete=True)
         return queryset
-    
+
     def update(self, request, *args, **kwargs):
         tasks = self.get_queryset()
         for task in tasks:
@@ -71,10 +79,10 @@ class TaskCompleteAPIView(UpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_object(self):
-        task_id = self.kwargs.get('task_id')
+        task_id = self.kwargs.get("task_id")
         task = Task.objects.get(id=task_id)
         return task
-    
+
     def update(self, request, *args, **kwargs):
         task = self.get_object()
         if task.is_complete:
@@ -88,15 +96,15 @@ class TaskCompleteAPIView(UpdateAPIView):
 class TaskUpdateAPIView(UpdateAPIView):
     serializer_class = TaskSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get_object(self):
-        task_id = self.kwargs.get('task_id')
+        task_id = self.kwargs.get("task_id")
         task = Task.objects.get(id=task_id)
         return task
-    
+
     def update(self, request, *args, **kwargs):
         task = self.get_object()
-        updated_task = request.data.get('task')
+        updated_task = request.data.get("task")
         task.task = updated_task
         task.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -107,7 +115,9 @@ class GetCompleteedTasksAPIView(APIView):
 
     def get(self, request):
         queryset = Task.objects.filter(is_active=True, is_complete=True)
-        active_task_count = Task.objects.filter(is_active=True, is_complete=False).count()
+        active_task_count = Task.objects.filter(
+            is_active=True, is_complete=False
+        ).count()
         serializer = TaskSerializer(queryset, many=True)
-        context = {'tasks': serializer.data, 'active_task_count': active_task_count}
+        context = {"tasks": serializer.data, "active_task_count": active_task_count}
         return Response(context)

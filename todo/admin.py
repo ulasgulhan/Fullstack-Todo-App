@@ -5,7 +5,7 @@ from .models import Task
 
 
 class TasksAdmin(admin.ModelAdmin):
-    list_display    = ('task', 'is_complete', 'is_active')
+    list_display = ("task", "is_complete", "is_active")
 
 
 admin.site.register(Task, TasksAdmin)

@@ -11,28 +11,31 @@ from .serializer import UserSerializer
 # Create your views here.
 
 
-
 class RegisterView(CreateAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
 
     def create(self, request, *args, **kwargs):
-        username = request.data.get('username', None)
+        username = request.data.get("username", None)
         user = User.objects.filter(username=username)
         if user.exists():
-            return Response({"error": "Username already exists."}, status=status.HTTP_406_NOT_ACCEPTABLE)
+            return Response(
+                {"error": "Username already exists."},
+                status=status.HTTP_406_NOT_ACCEPTABLE,
+            )
         else:
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             self.perform_create(serializer)
             return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 class LoginView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        username = request.data.get('username')
-        password = request.data.get('password')
+        username = request.data.get("username")
+        password = request.data.get("password")
         user = authenticate(username=username, password=password)
         if user:
             login(request, user)
@@ -47,4 +50,3 @@ class LogoutView(APIView):
     def post(self, request):
         logout(request)
         return Response(status=status.HTTP_204_NO_CONTENT)
-
