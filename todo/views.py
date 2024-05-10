@@ -16,8 +16,9 @@ class TaskAPIView(APIView):
 
     def get(self, request):
         queryset = Task.objects.filter(is_active=True, is_complete=False)
+        active_task_count = Task.objects.filter(is_active=True, is_complete=False).count()
         serializer = TaskSerializer(queryset, many=True)
-        context = {'tasks': serializer.data}
+        context = {'tasks': serializer.data, 'active_task_count': active_task_count}
         return Response(context)
     
     def post(self, request, *args, **kwargs):
@@ -106,6 +107,7 @@ class GetCompleteedTasksAPIView(APIView):
 
     def get(self, request):
         queryset = Task.objects.filter(is_active=True, is_complete=True)
+        active_task_count = Task.objects.filter(is_active=True, is_complete=False).count()
         serializer = TaskSerializer(queryset, many=True)
-        context = {'tasks': serializer.data}
+        context = {'tasks': serializer.data, 'active_task_count': active_task_count}
         return Response(context)
