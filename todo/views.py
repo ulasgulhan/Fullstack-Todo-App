@@ -26,9 +26,11 @@ class TaskAPIView(APIView):
     permission_classes = (permissions.AllowAny,)
 
     def get(self, request):
-        queryset = Task.objects.filter(is_active=True, is_complete=False)
+        queryset = Task.objects.filter(
+            user=request.user, is_active=True, is_complete=False
+        )
         active_task_count = Task.objects.filter(
-            is_active=True, is_complete=False
+            user=request.user, is_active=True, is_complete=False
         ).count()
         serializer = TaskSerializer(queryset, many=True)
         context = {"tasks": serializer.data, "active_task_count": active_task_count}
@@ -66,7 +68,9 @@ class DeleteAllCompletedTasksAPIView(UpdateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get_queryset(self):
-        queryset = Task.objects.filter(is_active=True, is_complete=True)
+        queryset = Task.objects.filter(
+            user=self.request.user, is_active=True, is_complete=True
+        )
         return queryset
 
     def update(self, request, *args, **kwargs):
@@ -117,9 +121,11 @@ class GetCompleteedTasksAPIView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
     def get(self, request):
-        queryset = Task.objects.filter(is_active=True, is_complete=True)
+        queryset = Task.objects.filter(
+            user=request.user, is_active=True, is_complete=True
+        )
         active_task_count = Task.objects.filter(
-            is_active=True, is_complete=False
+            user=request.user, is_active=True, is_complete=False
         ).count()
         serializer = TaskSerializer(queryset, many=True)
         context = {"tasks": serializer.data, "active_task_count": active_task_count}

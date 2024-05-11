@@ -1,7 +1,8 @@
 
 function submitRegisterForm() {
-    var username = document.getElementById("registerUsername").value;
-    fetch("/auth/register/", {
+    var username = document.getElementById('registerUsername').value;
+
+    fetch('/auth/register/', {
         method: 'POST',
         body: JSON.stringify({username: username}),
         headers: {
@@ -11,12 +12,12 @@ function submitRegisterForm() {
     .then(response => {
         if (response.status === 204) {
             getLoginAfterRegister()
-            document.getElementById("registerError").style.display = "none";
+            document.getElementById('registerError').style.display = 'none';
             console.log(response.error, response.statusText)
         } else if (response.status === 406) {
             response.json().then(data => {
-                document.getElementById("registerError").innerText = data.error;
-                document.getElementById("registerError").style.display = "block";
+                document.getElementById('registerError').innerText = data.error;
+                document.getElementById('registerError').style.display = 'block';
                 document.getElementById('registerSuccess').style.display = 'none'; 
                 
             });
@@ -35,7 +36,7 @@ document.body.addEventListener('htmx:afterRequest', (event) => {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    const registerForm = document.querySelector("#registerForm");
+    const registerForm = document.querySelector('#registerForm');
     if (registerForm) {
         registerForm.addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -59,7 +60,6 @@ function reloadPage() {
 
 
 function getLoginAfterRegister() {
-    console.log("getLoginAfterRegister function called");
     document.getElementById('registerForm').style.display = 'none';
     document.getElementById('registerSuccess').style.display = 'block'; 
     setTimeout(() => { showLoginForm(); }, 1500); 

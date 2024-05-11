@@ -11,7 +11,7 @@ This is a simple Todo web application built to help users manage their tasks eff
 
 **Mark Complete:** Mark tasks as complete when they are done.
 
-**Update Tasks:** Modify existing tasks as needed.
+**Update Tasks:** Double click to modify existing tasks as needed.
 
 ## Technologies Used
 **Frontend:** HTML, HTMX, TailwindCSS, JavaScript

@@ -13,7 +13,7 @@ class RegisterView(CreateAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
 
-    def create(self, request, *args, **kwargs):
+    def post(self, request):
         username = request.data.get("username", None)
         user = User.objects.filter(username=username)
         if user.exists():
@@ -21,10 +21,9 @@ class RegisterView(CreateAPIView):
                 {"error": "Username already exists."},
                 status=status.HTTP_406_NOT_ACCEPTABLE,
             )
-        else:
-            serializer = self.get_serializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
-            self.perform_create(serializer)
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
 
