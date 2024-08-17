@@ -1,5 +1,3 @@
-# Coderspace-Todo-Case
-
 ## Overview
 This is a simple Todo web application built to help users manage their tasks efficiently. Users can add, delete, mark tasks as complete, and update existing tasks using this application.
 
